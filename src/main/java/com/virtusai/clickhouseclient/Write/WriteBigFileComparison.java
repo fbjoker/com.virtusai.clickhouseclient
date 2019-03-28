@@ -32,7 +32,7 @@ public class WriteBigFileComparison {
     private static final int DATA_CHUNK = 128 * 1024 * 1024;
 
     // total data size is 2G
-    private static final long LEN = 8L * 1024 * 1024  * 1024L;
+    private static final long LEN = 20L * 1024 * 1024  * 1024L;
 
 
     public static void writeWithFileChannel() throws IOException {
@@ -124,7 +124,7 @@ public class WriteBigFileComparison {
         }
 
         data = null;
-        unmap(mbb);   // release MappedByteBuffer
+        //unmap(mbb);   // release MappedByteBuffer
         fileChannel.close();
     }
 
