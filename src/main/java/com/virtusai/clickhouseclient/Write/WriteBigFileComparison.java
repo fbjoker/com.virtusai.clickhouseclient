@@ -21,6 +21,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import static com.virtusai.clickhouseclient.Write.WriteOneMiliion.generateData;
+
 /**
  * NIO写大文件比较
  * @author Will
@@ -32,7 +34,8 @@ public class WriteBigFileComparison {
     private static final int DATA_CHUNK = 128 * 1024 * 1024;
 
     // total data size is 2G
-    private static final long LEN = 20L * 1024 * 1024  * 1024L;
+//    private static final long LEN = 1L * 1024 * 1024  * 1024L;
+    private static final long LEN = 30L * 1024 * 1024  * 1024L;
 
 
     public static void writeWithFileChannel() throws IOException {
@@ -214,6 +217,63 @@ public class WriteBigFileComparison {
         }
     }
 
+
+    /**
+     * write big file with MappedByteBuffer
+     *
+     * @throws IOException
+     */
+    public static void writeBigDataWithMappedByteBuffer(int id,String fieldsType, int fieldNumber,String[] partner) throws IOException {
+        File file = new File("d:/test.dat");
+        if (file.exists()) {
+            file.delete();
+        }
+
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        FileChannel fileChannel = raf.getChannel();
+        long pos = 0;
+        MappedByteBuffer mbb = null;
+        byte[] data = null;
+        long len = LEN;
+
+
+
+
+        while (len >= 0) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < 100000; i++) {
+
+                stringBuilder.append( generateData(id, fieldsType, fieldNumber, partner));
+            }
+
+            data = stringBuilder.toString().getBytes();
+            System.out.println("write a data chunk: " + data.length/1024/1024 + "MB");
+            mbb = fileChannel.map(FileChannel.MapMode.READ_WRITE, pos, data.length);
+//            data = new byte[DATA_CHUNK];
+            mbb.put(data);
+
+
+
+            len -= data.length;
+            pos += data.length;
+            data = null;
+            System.out.println("len:"+len);
+        }
+
+        if (len > 0) {
+            System.out.println("write rest data chunk: " + len + "B");
+
+            mbb = fileChannel.map(FileChannel.MapMode.READ_WRITE, pos, len);
+            data = new byte[(int) len];
+            mbb.put(data);
+        }
+
+        data = null;
+        //unmap(mbb);   // release MappedByteBuffer
+        fileChannel.close();
+    }
+
+
     public static void main(String[] args) throws IOException {
         StopWatch sw = new StopWatch();
 
@@ -225,9 +285,44 @@ public class WriteBigFileComparison {
 //        writeWithTransferTo();
 //        sw.stopAndPrint();
 
+        int fieldNumber = 420;
+
+        String fieldsType = "String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, String, String, " +
+                "String, String, String, String, String, String, String, String, String, String, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, " +
+                "Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Long, Long, Long, Long, " +
+                "Long, Double, Double";
+        String[] partner= {"YNYDZX","YNYDHW","JS_CMCC_CP","JS_CMCC_CP_ZX","HNYD","SD_CMCC_JN","LNYD","SAXYD"};
+
         long start = System.currentTimeMillis();
 
-        writeWithMappedByteBuffer();
+        writeBigDataWithMappedByteBuffer(100, fieldsType, fieldNumber, partner);
         long end = System.currentTimeMillis();
         System.out.println(end-start);
 
