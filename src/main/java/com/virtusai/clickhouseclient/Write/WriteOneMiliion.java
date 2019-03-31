@@ -111,6 +111,7 @@ public class WriteOneMiliion {
         }
         data.append( (Math.random() * 100)+",");
         data.append( (Math.random() * 100)+"\n");
+
         return data.toString();
     }
 }
