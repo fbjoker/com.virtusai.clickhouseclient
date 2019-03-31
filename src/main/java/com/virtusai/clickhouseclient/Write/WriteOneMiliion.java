@@ -52,6 +52,7 @@ public class WriteOneMiliion {
                 "Long, Double, Double";
         String[] partner= {"YNYDZX","YNYDHW","JS_CMCC_CP","JS_CMCC_CP_ZX","HNYD","SD_CMCC_JN","LNYD","SAXYD"};
 
+
         //创建文件
         try{
             if(!file.exists()){

@@ -33,6 +33,7 @@ public class WriteBigFileComparison {
     // data chunk be written per time
     private static final int DATA_CHUNK = 128 * 1024 * 1024;
 
+
     // total data size is 2G
 //    private static final long LEN = 1L * 1024 * 1024  * 1024L;
     private static final long LEN = 30L * 1024 * 1024  * 1024L;
